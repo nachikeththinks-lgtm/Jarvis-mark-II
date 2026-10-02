@@ -1,62 +1,1134 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JARVIS Mk II</title>
-</head>
-  
-<style>
-  body {
-  margin: 0;
-  background: #05080d;
-  color: #00d9ff;
-  font-family: Arial, sans-serif;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  }
-  h1 {
-  font-size: 48px;
-  letter-spacing: 10px;
-  text-shadow:
-    0 0 10px #00d9ff,
-    0 0 25px #007a99;
-  }
-  .reactor {
-  width: 240px;
-  height: 240px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-    flex-direction: column;
-}
 
-.core {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  background: #00d9ff;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 40px;
-  box-shadow:
-    0 0 20px #00d9ff,
-    0 0 60px #007a99;
+  <style>
+    * {
+      box-sizing: border-box;
     }
-  
-    </style>
-  <body>
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at center, #07151d 0%, #05080d 45%, #020406 100%);
+      color: #00d9ff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* HUD */
+
+    .hud {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Title */
+
+    .hud-title {
+      position: relative;
+      z-index: 10;
+
+      margin-top: 35px;
+      font-size: 44px;
+      letter-spacing: 12px;
+
+      text-shadow:
+        0 0 10px #00d9ff,
+        0 0 25px #00d9ff,
+        0 0 45px #007a99;
+
+      animation: titleGlow 2s infinite alternate;
+    }
+
+    .hud-title span {
+      font-size: 58px;
+    }
+
+    @keyframes titleGlow {
+      from {
+        opacity: 0.7;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Status */
+
+    #status {
+      position: relative;
+      z-index: 10;
+
+      margin-top: 8px;
+      color: #8defff;
+      font-size: 14px;
+      letter-spacing: 4px;
+
+      text-shadow: 0 0 10px #00d9ff;
+    }
+
+    /* Reactor */
+
+    #reactor {
+      position: absolute;
+
+      top: 50%;
+      left: 50%;
+
+      width: 300px;
+      height: 300px;
+
+      transform: translate(-50%, -50%);
+    }
+
+    /* Reactor rings */
+
+    .ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+
+      border: 2px solid #00d9ff;
+      border-radius: 50%;
+
+      box-shadow:
+        0 0 10px #00d9ff,
+        inset 0 0 10px #007a99;
+
+      transform-origin: center;
+    }
+
+    .ring1 {
+      width: 290px;
+      height: 290px;
+
+      margin-left: -145px;
+      margin-top: -145px;
+
+      animation: rotate1 12s linear infinite;
+    }
+
+    .ring2 {
+      width: 250px;
+      height: 250px;
+
+      margin-left: -125px;
+      margin-top: -125px;
+
+      border-style: dashed;
+
+      animation: rotate2 8s linear infinite;
+    }
+
+    .ring3 {
+      width: 215px;
+      height: 145px;
+
+      margin-left: -107px;
+      margin-top: -72px;
+
+      border-color: #007a99;
+
+      animation: rotate3 10s linear infinite;
+    }
+
+    @keyframes rotate1 {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes rotate2 {
+      from {
+        transform: rotate(360deg);
+      }
+
+      to {
+        transform: rotate(0deg);
+      }
+    }
+
+    @keyframes rotate3 {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Reactor core */
+
+    #orb {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 170px;
+      height: 170px;
+
+      margin-left: -85px;
+      margin-top: -85px;
+
+      border-radius: 50%;
+
+      border: 3px solid #00d9ff;
+
+      background:
+        radial-gradient(
+          circle,
+          #ffffff 0%,
+          #bfffff 5%,
+          #00d9ff 14%,
+          #008baa 30%,
+          #06313d 52%,
+          #020608 75%
+        );
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      color: white;
+      font-size: 42px;
+      font-weight: bold;
+
+      text-shadow:
+        0 0 10px white,
+        0 0 20px #00d9ff;
+
+      box-shadow:
+        0 0 15px white,
+        0 0 35px #00d9ff,
+        0 0 75px #007a99,
+        inset 0 0 35px #00d9ff;
+
+      animation: reactorPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes reactorPulse {
+      0% {
+        transform: scale(1);
+        box-shadow:
+          0 0 15px white,
+          0 0 35px #00d9ff,
+          0 0 75px #007a99,
+          inset 0 0 35px #00d9ff;
+      }
+
+      50% {
+        transform: scale(1.06);
+        box-shadow:
+          0 0 25px white,
+          0 0 55px #00d9ff,
+          0 0 100px #007a99,
+          inset 0 0 45px #00d9ff;
+      }
+
+      100% {
+        transform: scale(1);
+        box-shadow:
+          0 0 15px white,
+          0 0 35px #00d9ff,
+          0 0 75px #007a99,
+          inset 0 0 35px #00d9ff;
+      }
+    }
+
+    /* Activate button */
+
+    button {
+      position: absolute;
+
+      bottom: 75px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      background: rgba(0, 217, 255, 0.03);
+
+      color: #00d9ff;
+
+      border: 2px solid #00d9ff;
+      border-radius: 30px;
+
+      padding: 14px 30px;
+
+      font-size: 17px;
+      letter-spacing: 2px;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 0 15px #007a99,
+        inset 0 0 10px #003542;
+
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: rgba(0, 217, 255, 0.12);
+
+      box-shadow:
+        0 0 25px #00d9ff,
+        inset 0 0 15px #007a99;
+    }
+
+    button:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    /* Output */
+
+    #output {
+      position: absolute;
+
+      bottom: 20px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 90%;
+      max-width: 700px;
+
+      color: white;
+
+      font-size: 16px;
+
+      min-height: 25px;
+
+      text-shadow: 0 0 8px #00d9ff;
+    }
+
+    /* Decorative HUD lines */
+
+    .hud-line {
+      position: absolute;
+
+      width: 25%;
+      height: 1px;
+
+      background: #00d9ff;
+
+      opacity: 0.35;
+
+      box-shadow: 0 0 8px #00d9ff;
+    }
+
+    .line-left {
+      left: 0;
+      top: 50%;
+    }
+
+    .line-right {
+      right: 0;
+      top: 50%;
+    }
+
+    /* Mobile */
+
+    @media (max-width: 600px) {
+
+      .hud-title {
+        font-size: 32px;
+        letter-spacing: 7px;
+        margin-top: 25px;
+      }
+
+      .hud-title span {
+        font-size: 42px;
+      }
+
+      #reactor {
+        width: 270px;
+        height: 270px;
+      }
+
+      .ring1 {
+        width: 260px;
+        height: 260px;
+
+        margin-left: -130px;
+        margin-top: -130px;
+      }
+
+      .ring2 {
+        width: 225px;
+        height: 225px;
+
+        margin-left: -112px;
+        margin-top: -112px;
+      }
+
+      .ring3 {
+        width: 195px;
+        height: 125px;
+
+        margin-left: -97px;
+        margin-top: -62px;
+      }
+
+      #orb {
+        width: 150px;
+        height: 150px;
+
+        margin-left: -75px;
+        margin-top: -75px;
+
+        font-size: 35px;
+      }
+
+      button {
+        bottom: 65px;
+      }
+
+      #output {
+        bottom: 15px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
 
   <div class="hud">
-    <h1>JARVIS Mk II</h1>
 
-    <div class="reactor">
-      <div class="core">J</div>
+    <div class="hud-title">
+      <span>J</span> A R V I S
     </div>
+
+    <div id="status">
+      MK II • SYSTEM STANDBY
+    </div>
+
+    <div class="hud-line line-left"></div>
+    <div class="hud-line line-right"></div>
+
+    <div id="reactor">
+
+      <div class="ring ring1"></div>
+      <div class="ring ring2"></div>
+      <div class="ring ring3"></div>
+
+      <div id="orb">
+        J
+      </div>
+
+    </div>
+
+    <button onclick="listen()">
+      🎙️ ACTIVATE
+    </button>
+
+    <div id="output">
+      Good day, sir. JARVIS Mk II online.
+    </div>
+
   </div>
 
-  </body>
-  
-</html>
+
+<script>
+
+/* =========================================
+   JARVIS MK II VOICE
+   ========================================= */
+
+function speak(text) {
+
+  const voice = new SpeechSynthesisUtterance(text);
+
+  const voices = speechSynthesis.getVoices();
+
+  const preferredVoice =
+    voices.find(v =>
+      v.lang === "en-GB" &&
+      v.name.toLowerCase().includes("google")
+    ) ||
+    voices.find(v =>
+      v.lang.startsWith("en-GB")
+    ) ||
+    voices.find(v =>
+      v.name.toLowerCase().includes("google")
+    ) ||
+    voices.find(v =>
+      v.lang.startsWith("en")
+    );
+
+  if (preferredVoice) {
+    voice.voice = preferredVoice;
+  }
+
+  voice.lang = "en-GB";
+
+  /* Mk II voice profile */
+  voice.rate = 0.94;
+  voice.pitch = 0.68;
+  voice.volume = 1;
+
+  speechSynthesis.cancel();
+
+  speechSynthesis.speak(voice);
+}
+
+
+/* =========================================
+   JARVIS RESPONSE SYSTEM
+   ========================================= */
+
+function respond(text) {
+
+  const originalText = text;
+  let lowerText = text.toLowerCase().trim();
+
+
+  /* =====================================
+     CALCULATOR
+     ===================================== */
+
+  if (lowerText.startsWith("calculate ")) {
+
+    let expression =
+      text.substring(10).toLowerCase().trim();
+
+
+    /* Square root */
+
+    expression = expression.replace(
+      /√\s*(\d+(?:\.\d+)?)/g,
+      "square root of $1"
+    );
+
+
+    if (
+      expression.startsWith("the square root of ") ||
+      expression.startsWith("square root of ") ||
+      expression.startsWith("square root ")
+    ) {
+
+      let numberText = expression
+        .replace("the square root of ", "")
+        .replace("square root of ", "")
+        .replace("square root ", "")
+        .trim();
+
+      const number = parseFloat(numberText);
+
+      if (!isNaN(number) && number >= 0) {
+
+        return "The answer is " +
+          Math.sqrt(number) +
+          ", sir.";
+
+      }
+
+      return "I couldn't calculate that, sir.";
+    }
+
+
+    /* Powers */
+
+    expression = expression
+      .replace(/to the power of/g, "^")
+      .replace(/raised to the power of/g, "^")
+      .replace(/squared/g, "^2")
+      .replace(/cubed/g, "^3");
+
+
+    /* Basic operations */
+
+    expression = expression
+      .replace(/multiplied by/g, "*")
+      .replace(/times/g, "*")
+      .replace(/divided by/g, "/")
+      .replace(/divide by/g, "/")
+      .replace(/plus/g, "+")
+      .replace(/minus/g, "-");
+
+
+    /* Percentages */
+
+    expression = expression.replace(
+      /(\d+(?:\.\d+)?)\s*percent of\s*(\d+(?:\.\d+)?)/g,
+      "($1/100)*$2"
+    );
+
+
+    /* Safety check */
+
+    if (!/^[0-9+\-*/^().\s]+$/.test(expression)) {
+
+      return "I couldn't calculate that, sir.";
+    }
+
+
+    try {
+
+      expression = expression.replace(
+        /(\d+(?:\.\d+)?)\s*\^\s*(\d+(?:\.\d+)?)/g,
+        "Math.pow($1,$2)"
+      );
+
+
+      const result = Function(
+        '"use strict"; return (' +
+        expression +
+        ')'
+      )();
+
+
+      if (
+        typeof result === "number" &&
+        isFinite(result)
+      ) {
+
+        return "The answer is " +
+          result +
+          ", sir.";
+      }
+
+      return "I couldn't calculate that, sir.";
+
+    } catch {
+
+      return "I couldn't calculate that, sir.";
+    }
+  }
+
+
+  /* =====================================
+     YOUTUBE
+     ===================================== */
+
+  if (
+    lowerText.startsWith("search youtube for ")
+  ) {
+
+    const query =
+      text.substring(19).trim();
+
+    window.open(
+      "https://www.youtube.com/results?search_query=" +
+      encodeURIComponent(query),
+      "_blank"
+    );
+
+    return "Searching YouTube for " +
+      query +
+      ", sir.";
+  }
+
+
+  /* =====================================
+     SPOTIFY
+     ===================================== */
+
+  if (
+    lowerText.startsWith("play ") &&
+    lowerText.includes(" on spotify")
+  ) {
+
+    const command =
+      text.substring(5).trim();
+
+    const query =
+      command
+        .replace(/ on spotify$/i, "")
+        .trim();
+
+    window.open(
+      "https://open.spotify.com/search/" +
+      encodeURIComponent(query),
+      "_blank"
+    );
+
+    return "Searching Spotify for " +
+      query +
+      ", sir.";
+  }
+
+
+  if (
+    lowerText.startsWith("search spotify for ")
+  ) {
+
+    const query =
+      text.substring(19).trim();
+
+    window.open(
+      "https://open.spotify.com/search/" +
+      encodeURIComponent(query),
+      "_blank"
+    );
+
+    return "Searching Spotify for " +
+      query +
+      ", sir.";
+  }
+
+
+  /* =====================================
+     GOOGLE SEARCH
+     ===================================== */
+
+  if (
+    lowerText.startsWith("search google for ")
+  ) {
+
+    const query =
+      text.substring(18).trim();
+
+    window.open(
+      "https://www.google.com/search?q=" +
+      encodeURIComponent(query),
+      "_blank"
+    );
+
+    return "Searching Google for " +
+      query +
+      ", sir.";
+  }
+
+
+  /* =====================================
+     NAME MEMORY
+     ===================================== */
+
+  if (
+    lowerText.startsWith("my name is ")
+  ) {
+
+    const name =
+      text.substring(11).trim();
+
+    localStorage.setItem(
+      "jarvis_name",
+      name
+    );
+
+    return "I'll remember your name, " +
+      name +
+      ", sir.";
+  }
+
+
+  if (
+    lowerText.includes("what is my name") ||
+    lowerText.includes("what's my name")
+  ) {
+
+    const name =
+      localStorage.getItem("jarvis_name");
+
+    if (name) {
+
+      return "Your name is " +
+        name +
+        ", sir.";
+    }
+
+    return "You haven't told me your name yet, sir.";
+  }
+
+
+  /* =====================================
+     GENERAL MEMORY
+     ===================================== */
+
+  if (
+    lowerText.startsWith("remember that ")
+  ) {
+
+    const memory =
+      text.substring(14).trim();
+
+    if (memory) {
+
+      const memories =
+        JSON.parse(
+          localStorage.getItem(
+            "jarvis_memories"
+          ) || "[]"
+        );
+
+
+      memories.push(memory);
+
+
+      localStorage.setItem(
+        "jarvis_memories",
+        JSON.stringify(memories)
+      );
+
+
+      return "I'll remember that, sir.";
+    }
+  }
+
+
+  if (
+    lowerText.startsWith("what do you remember") ||
+    lowerText.startsWith("what do you know about me")
+  ) {
+
+    const memories =
+      JSON.parse(
+        localStorage.getItem(
+          "jarvis_memories"
+        ) || "[]"
+      );
+
+
+    if (memories.length === 0) {
+
+      return "I don't have any general memories stored yet, sir.";
+    }
+
+
+    return "I remember: " +
+      memories.join(". ") +
+      ".";
+  }
+
+
+  /* =====================================
+     GREETINGS
+     ===================================== */
+
+  if (lowerText.includes("good morning")) {
+
+    return "Good morning, sir. Mk II systems are online and ready.";
+  }
+
+
+  if (lowerText.includes("good evening")) {
+
+    return "Good evening, sir. How may I assist you?";
+  }
+
+
+  if (lowerText.includes("good night")) {
+
+    return "Good night, sir. I'll be here when you need me.";
+  }
+
+
+  /* =====================================
+     CAPABILITIES
+     ===================================== */
+
+  if (
+    lowerText.includes("what can you do") ||
+    lowerText.includes("what are your capabilities")
+  ) {
+
+    return "I can calculate, search Google and YouTube, search Spotify, remember information you give me, tell jokes, report the time and date, and respond to voice commands, sir.";
+  }
+
+
+  /* =====================================
+     STATUS
+     ===================================== */
+
+  if (
+    lowerText.includes("are you there") ||
+    lowerText.includes("are you online")
+  ) {
+
+    return "Always, sir. Mk II systems are online and operational.";
+  }
+
+
+  /* =====================================
+     THANK YOU
+     ===================================== */
+
+  if (
+    lowerText.includes("thank you") ||
+    lowerText.includes("thanks")
+  ) {
+
+    return "You're most welcome, sir.";
+  }
+
+
+  /* =====================================
+     JOKES
+     ===================================== */
+
+  if (
+    lowerText.includes("tell me a joke") ||
+    lowerText.includes("tell me something funny")
+  ) {
+
+    const jokes = [
+
+      "Why did the bicycle fall over? Because it was two-tired, sir.",
+
+      "Why don't eggs tell jokes? They might crack up, sir.",
+
+      "What do you call a sleeping bull? A bulldozer, sir.",
+
+      "Why did the banana go to the doctor? Because it wasn't peeling well, sir.",
+
+      "What do you call a bear with no teeth? A gummy bear, sir.",
+
+      "Why did the tomato turn red? Because it saw the salad dressing, sir.",
+
+      "What did one wall say to the other wall? I'll meet you at the corner, sir.",
+
+      "Why did the math book look sad? Because it had too many problems, sir.",
+
+      "What do you call a fish wearing a bowtie? Sofishticated, sir.",
+
+      "Why did the cookie go to the hospital? Because it felt crumby, sir.",
+
+      "What do you call a cow with no legs? Ground beef, sir.",
+
+      "Why did the golfer bring two pairs of trousers? In case he got a hole in one, sir.",
+
+      "What did the ocean say to the beach? Nothing. It just waved, sir.",
+
+      "Why don't skeletons fight each other? They don't have the guts, sir.",
+
+      "What kind of tree fits in your hand? A palm tree, sir."
+    ];
+
+
+    return jokes[
+      Math.floor(
+        Math.random() * jokes.length
+      )
+    ];
+  }
+
+
+  /* =====================================
+     HELLO
+     ===================================== */
+
+  if (
+    lowerText.includes("hello") ||
+    lowerText.includes("hi")
+  ) {
+
+    return "Good day, sir. JARVIS Mk II online and ready.";
+  }
+
+
+  /* =====================================
+     IDENTITY
+     ===================================== */
+
+  if (
+    lowerText.includes("who are you")
+  ) {
+
+    return "I am JARVIS Mk II, your personal artificial intelligence assistant.";
+  }
+
+
+  /* =====================================
+     HOW ARE YOU
+     ===================================== */
+
+  if (
+    lowerText.includes("how are you")
+  ) {
+
+    return "All Mk II systems are operating normally, sir.";
+  }
+
+
+  /* =====================================
+     TIME
+     ===================================== */
+
+  if (
+    lowerText.includes("time")
+  ) {
+
+    return "The current time is " +
+      new Date().toLocaleTimeString() +
+      ", sir.";
+  }
+
+
+  /* =====================================
+     DATE
+     ===================================== */
+
+  if (
+    lowerText.includes("date")
+  ) {
+
+    return "Today's date is " +
+      new Date().toLocaleDateString() +
+      ", sir.";
+  }
+
+
+  /* =====================================
+     OPEN GOOGLE
+     ===================================== */
+
+  if (
+    lowerText.includes("open google")
+  ) {
+
+    window.open(
+      "https://www.google.com",
+      "_blank"
+    );
+
+    return "Opening Google, sir.";
+  }
+
+
+  /* =====================================
+     OPEN YOUTUBE
+     ===================================== */
+
+  if (
+    lowerText.includes("open youtube")
+  ) {
+
+    window.open(
+      "https://www.youtube.com",
+      "_blank"
+    );
+
+    return "Opening YouTube, sir.";
+  }
+
+
+  /* =====================================
+     FALLBACK
+     ===================================== */
+
+  return "I heard you say: " +
+    originalText +
+    ". I don't have an answer for that command yet, sir.";
+}
+
+
+/* =========================================
+   VOICE RECOGNITION
+   ========================================= */
+
+function listen() {
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+  if (!SpeechRecognition) {
+
+    document.getElementById("output").innerText =
+      "Voice recognition isn't supported in this browser.";
+
+    return;
+  }
+
+
+  const recognition =
+    new SpeechRecognition();
+
+
+  recognition.lang = "en-US";
+
+  recognition.interimResults = false;
+
+  recognition.continuous = false;
+
+
+  document.getElementById("status").innerText =
+    "MK II • LISTENING";
+
+
+  recognition.start();
+
+
+  recognition.onresult = function(event) {
+
+    const text =
+      event.results[0][0].transcript;
+
+
+    document.getElementById("output").innerText =
+      "You: " + text;
+
+
+    const answer =
+      respond(text);
+
+
+    setTimeout(function() {
+
+      document.getElementById("output").innerText =
+        "JARVIS Mk II: " + answer;
+
+
+      speak(answer);
+
+    }, 400);
+  };
+
+
+  recognition.onerror = function(event) {
+
+    document.getElementById("status").innerText =
+      "MK II • SYSTEM READY";
+
+
+    document.getElementById("output").innerText =
+      "Voice recognition error: " +
+      event.error;
+  };
+
+
+  recognition.onend = function() {
+
+    document.getElementById("status").innerText =
+      "MK II • SYSTEM READY";
+  };
+}
+
+
+/* =========================================
+   STARTUP
+   ========================================= */
+
+window.speechSynthesis.onvoiceschanged = function() {
+  // Allows the browser to load available voices.
+};
+
+
+setTimeout(function() {
+
+  speak(
+    "Good day, sir. JARVIS Mk II online."
+  );
+
+}, 800);
+
+</script>
+
+</body>
+  </html>
