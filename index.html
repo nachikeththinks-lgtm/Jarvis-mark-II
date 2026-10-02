@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JARVIS Mk II</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#03080d;color:#00d9ff;font-family:Arial,sans-serif;text-align:center}
+#boot{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9;letter-spacing:3px}
+#bootbar{width:250px;height:5px;border:1px solid #00d9ff;margin-top:18px}
+#bootfill{height:100%;width:0;background:#00d9ff}
+#app{display:none;padding:18px}
+h1{font-size:clamp(36px,9vw,58px);letter-spacing:10px;margin:10px 0 4px;text-shadow:0 0 12px #00d9ff}
+#status{font-size:13px;letter-spacing:3px;color:#9eefff}
+#clock{margin:8px;color:white}
+#reactor{width:250px;height:250px;margin:22px auto;position:relative;display:flex;align-items:center;justify-content:center}
+#orb{width:125px;height:125px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:bold;background:radial-gradient(circle,#fff 0,#00d9ff 18%,#006078 43%,#02080c 72%);border:3px solid #00d9ff;box-shadow:0 0 20px #fff,0 0 45px #00d9ff,0 0 85px #007a99;z-index:2;animation:pulse 2s infinite}
+.ring{position:absolute;border:2px solid #00d9ff;border-radius:50%;box-shadow:0 0 12px #00d9ff}
+.r1{width:175px;height:175px;animation:spin 8s linear infinite;border-top-color:transparent}
+.r2{width:215px;height:215px;animation:spin 12s linear reverse infinite;border-right-color:transparent}
+.r3{width:248px;height:248px;animation:spin 18s linear infinite;border-bottom-color:transparent}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.06);filter:brightness(1.4)}}
+.listening #orb{animation:pulse .5s infinite}
+.listening .ring{box-shadow:0 0 25px #fff}
+button{background:transparent;color:#00d9ff;border:2px solid #00d9ff;border-radius:25px;padding:12px 22px;font-size:16px;box-shadow:0 0 12px #007a99}
+#output{max-width:850px;margin:20px auto;min-height:48px;color:white;font-size:17px}
+#console{max-width:850px;margin:12px auto;display:flex;gap:7px}
+#input{flex:1;background:#020609;color:#00d9ff;border:1px solid #007a99;padding:12px;border-radius:6px;outline:0}
+.grid{max-width:850px;margin:15px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.panel{border:1px solid #00647d;background:#041219;padding:13px;border-radius:7px;text-align:left}
+.title{font-size:11px;letter-spacing:3px;margin-bottom:9px}
+#history{max-height:170px;overflow:auto}
+.item{padding:7px 0;border-bottom:1px solid #12313a;font-size:13px}
+.you{color:white}.jarvis{color:#00d9ff}
+.bar{height:6px;border:1px solid #007a99;margin:8px 0}.fill{height:100%;background:#00d9ff;width:70%}
+</style>
+</head>
+<body>
+<div id="boot">JARVIS Mk II<br>INITIALISING...<div id="bootbar"><div id="bootfill"></div></div></div>
+
+<div id="app">
+<h1><span>J</span>ARVIS</h1>
+<div id="status">SYSTEM READY</div>
+<div id="clock"></div>
+
+<div id="reactor">
+<div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+<div id="orb">J</div>
+</div>
+
+<button onclick="listen()">🎙️ ACTIVATE JARVIS</button>
+<div id="output">Good day, sir. JARVIS Mk II online.</div>
+
+<div id="console">
+<input id="input" placeholder="Enter a command..." onkeydown="if(event.key==='Enter')send()">
+<button onclick="send()">SEND</button>
+</div>
+
+<div class="grid">
+<div class="panel">
+<div class="title">SYSTEM STATUS</div>
+<div>CORE — ONLINE</div>
+<div>VOICE — READY</div>
+<div>MEMORY — READY</div>
+<div>NETWORK — <span id="network">CHECKING</span></div>
+</div>
+
+<div class="panel">
+<div class="title">CORE ACTIVITY</div>
+<div>PROCESSING<div class="bar"><div id="process" class="fill"></div></div></div>
+<div>ENERGY<div class="bar"><div id="energy" class="fill"></div></div></div>
+</div>
+
+<div class="panel">
+<div class="title">COMMAND HISTORY</div>
+<div id="history">System initialised.</div>
+</div>
+
+<div class="panel">
+<div class="title">MEMORY</div>
+<div id="memory">No stored memories.</div>
+</div>
+</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+let p=0;
+const boot=setInterval(()=>{
+ p+=10;$("bootfill").style.width=p+"%";
+ if(p>=100){clearInterval(boot);setTimeout(()=>{
+  $("boot").style.display="none";$("app").style.display="block";
+  speak("Good day, sir. JARVIS Mk Two is online and ready.");
+ },300)}
+},100);
+
+function speak(t){
+ if(!("speechSynthesis"in window))return;
+ const u=new SpeechSynthesisUtterance(t),v=speechSynthesis.getVoices();
+ const x=v.find(a=>a.lang.toLowerCase()=="en-gb")||v.find(a=>a.name.toLowerCase().includes("google"))||v.find(a=>a.lang.startsWith("en"));
+ if(x)u.voice=x;
+ u.lang="en-GB";u.rate=.86;u.pitch=.72;u.volume=1;
+ speechSynthesis.cancel();$("status").textContent="JARVIS SPEAKING";speechSynthesis.speak(u);
+ u.onend=()=>$("status").textContent="SYSTEM READY";
+}
+
+function calc(e){
+ e=e.toLowerCase().trim();
+ if(e.startsWith("square root of ")||e.startsWith("the square root of ")){
+  e=e.replace("the square root of ","").replace("square root of ","").trim();
+  let n=parseFloat(e);return !isNaN(n)&&n>=0?"The answer is "+Math.sqrt(n)+", sir.":"I couldn't calculate that, sir.";
+ }
+ e=e.replace(/to the power of/g,"^").replace(/raised to the power of/g,"^").replace(/squared/g,"^2").replace(/cubed/g,"^3").replace(/multiplied by/g,"*").replace(/times/g,"*").replace(/divided by/g,"/").replace(/divide by/g,"/").replace(/plus/g,"+").replace(/minus/g,"-");
+ if(!/^[0-9+\-*/^().\s]+$/.test(e))return"I couldn't calculate that, sir.";
+ try{
+  e=e.replace(/(\d+(?:\.\d+)?)\s*\^\s*(\d+(?:\.\d+)?)/g,"Math.pow($1,$2)");
+  let r=Function('"use strict";return('+e+')')();
+  return typeof r=="number"&&isFinite(r)?"The answer is "+r+", sir.":"I couldn't calculate that, sir.";
+ }catch{return"I couldn't calculate that, sir."}
+}
+
+function memoryDisplay(){
+ let m=JSON.parse(localStorage.getItem("jarvis_memories")||"[]");
+ $("memory").innerHTML=m.length?m.slice(-6).map(x=>"• "+safe(x)).join("<br>"):"No stored memories.";
+}
+
+function safe(x){
+ return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function respond(raw){
+ let t=raw.trim(),x=t.toLowerCase();
+
+ if(x.startsWith("calculate "))return calc(t.slice(10));
+
+ if(x.startsWith("my name is ")){
+  let n=t.slice(11).trim();localStorage.setItem("jarvis_name",n);return"I'll remember your name, "+n+", sir.";
+ }
+ if(x.includes("what is my name")||x.includes("what's my name")){
+  let n=localStorage.getItem("jarvis_name");return n?"Your name is "+n+", sir.":"You haven't told me your name yet, sir.";
+ }
+
+ if(x.startsWith("remember that ")){
+  let m=t.slice(14).trim();
+  if(m){let a=JSON.parse(localStorage.getItem("jarvis_memories")||"[]");a.push(m);localStorage.setItem("jarvis_memories",JSON.stringify(a));memoryDisplay();return"Memory updated. I'll remember that, sir."}
+ }
+ if(x.includes("what do you remember")||x.includes("what do you know about me")){
+  let a=JSON.parse(localStorage.getItem("jarvis_memories")||"[]");return a.length?"I remember: "+a.join(". ")+".":"I don't have any general memories stored yet, sir.";
+ }
+ if(x.includes("forget everything")||x.includes("clear your memory")){
+  localStorage.removeItem("jarvis_memories");localStorage.removeItem("jarvis_name");memoryDisplay();return"All stored memories have been cleared, sir.";
+ }
+
+ if(x.startsWith("search google for ")){
+  let q=t.slice(18).trim();open("https://www.google.com/search?q="+encodeURIComponent(q));return"Searching Google for "+q+", sir.";
+ }
+ if(x.startsWith("search youtube for ")){
+  let q=t.slice(19).trim();open("https://www.youtube.com/results?search_query="+encodeURIComponent(q));return"Searching YouTube for "+q+", sir.";
+ }
+ if(x.startsWith("search spotify for ")){
+  let q=t.slice(19).trim();open("https://open.spotify.com/search/"+encodeURIComponent(q));return"Searching Spotify for "+q+", sir.";
+ }
+ if(x.startsWith("play ")&&x.includes(" on spotify")){
+  let q=t.slice(5).replace(/ on spotify$/i,"").trim();open("https://open.spotify.com/search/"+encodeURIComponent(q));return"Searching Spotify for "+q+", sir.";
+ }
+ if(x.includes("open google")){open("https://www.google.com");return"Opening Google, sir."}
+ if(x.includes("open youtube")){open("https://www.youtube.com");return"Opening YouTube, sir."}
+
+ if(x.includes("good morning"))return"Good morning, sir. All systems are online and ready.";
+ if(x.includes("good evening"))return"Good evening, sir. How may I assist you?";
+ if(x.includes("good night"))return"Good night, sir. I'll remain ready when you need me.";
+ if(x=="hello"||x=="hi"||x.includes("hello jarvis")||x.includes("hi jarvis"))return"Good day, sir. JARVIS Mk II online.";
+ if(x.includes("who are you"))return"I am JARVIS Mk II, your personal artificial intelligence assistant.";
+ if(x.includes("what can you do")||x.includes("what are your capabilities"))return"I can calculate, search Google, YouTube and Spotify, remember information, show system status, keep command history, and respond to voice commands, sir.";
+ if(x.includes("are you there")||x.includes("are you online")||x.includes("status report"))return"All systems are online. Core, memory and voice systems are operational, sir.";
+ if(x=="time"||x.includes("what time"))return"The current time is "+new Date().toLocaleTimeString()+", sir.";
+ if(x=="date"||x.includes("what is the date")||x.includes("what's the date"))return"Today's date is "+new Date().toLocaleDateString()+", sir.";
+ if(x.includes("thank you")||x.includes("thanks"))return"You're most welcome, sir.";
+
+ if(x.includes("tell me a joke")||x.includes("tell me something funny")){
+  let j=["Why did the bicycle fall over? Because it was two-tired, sir.","Why don't eggs tell jokes? They might crack up, sir.","What do you call a sleeping bull? A bulldozer, sir.","Why did the banana go to the doctor? Because it wasn't peeling well, sir."];
+  return j[Math.floor(Math.random()*j.length)];
+ }
+ return"I heard you say: "+t+". I don't have an answer for that command yet, sir.";
+}
+
+function history(a,b){
+ let d=document.createElement("div");d.className="item";
+ d.innerHTML='<div class="you">YOU: '+safe(a)+'</div><div class="jarvis">JARVIS: '+safe(b)+'</div>';
+ $("history").prepend(d);
+}
+
+function process(t){
+ if(!t.trim())return;
+ $("output").textContent="You: "+t;
+ $("process").style.width="95%";
+ let a=respond(t);
+ setTimeout(()=>{
+  $("output").textContent="JARVIS: "+a;history(t,a);speak(a);$("process").style.width="30%";
+ },250);
+}
+
+function send(){let i=$("input"),t=i.value.trim();if(t){i.value="";process(t)}}
+
+function listen(){
+ const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!R){$("output").textContent="Voice recognition isn't supported in this browser, sir.";return}
+ let r=new R();r.lang="en-US";r.interimResults=false;
+ document.body.classList.add("listening");$("status").textContent="LISTENING...";
+ r.onresult=e=>process(e.results[0][0].transcript);
+ r.onerror=()=>$("status").textContent="VOICE ERROR";
+ r.onend=()=>{document.body.classList.remove("listening");setTimeout(()=>$("status").textContent="SYSTEM READY",400)};
+ r.start();
+}
+
+function clock(){$("clock").textContent=new Date().toLocaleDateString()+" • "+new Date().toLocaleTimeString()}
+setInterval(clock,1000);clock();
+$("network").textContent=navigator.onLine?"ONLINE":"OFFLINE";
+addEventListener("online",()=>$("network").textContent="ONLINE");
+addEventListener("offline",()=>$("network").textContent="OFFLINE");
+setInterval(()=>{$("process").style.width=(25+Math.random()*45)+"%";$("energy").style.width=(65+Math.random()*30)+"%"},1500);
+memoryDisplay();
+</script>
+</body>
+</html>
